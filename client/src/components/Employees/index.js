@@ -4,20 +4,15 @@ import axios from 'axios';
 
 export const Employees = () => {
 
+    const BASE_URL = 'http://localhost:3001';
     const [employeeList, setEmployeeList] = useState([]);
     const [name, setName] = useState('');
 	const [age, setAge] = useState('');
 	const [country, setCountry] = useState('');
 	const [job, setJob] = useState('');
 	const [wage, setWage] = useState('');
-
     const data = {name, age, country, job, wage};
-
-    const [edit, setEdit] = useState({
-        id: undefined,
-        isEditing: false
-    });
-
+    const [edit, setEdit] = useState({ id: undefined, isEditing: false });
 
     const handleEditEmployee = (id) => {
         if (
@@ -26,15 +21,17 @@ export const Employees = () => {
             country.trim() !== '' && job.trim() !== '' && 
             wage > 0 && wage < 1000000000000
         ){
-            axios.put('http://localhost:3001/edit', {...data, id})
-            .then(res => setEmployeeList([...res.data]));
-            setEdit({id: undefined, isEditing: false})
+            axios.put(`${BASE_URL}/edit`, {...data, id})
+            .then(res => {
+                setEmployeeList([...res.data])
+                setEdit({id: undefined, isEditing: false})
+            });
         }
     }
 
     const handleRemoveEmployee = (id) => {
         if (!edit.isEditing) {
-            axios.delete(`http://localhost:3001/remove/${id}`)
+            axios.delete(`${BASE_URL}/remove/${id}`)
             .then((res) => {
                 if (!res.data.error) setEmployeeList([...res.data.result]);
             })
@@ -42,13 +39,19 @@ export const Employees = () => {
     }
 
     useEffect(() => {
-        axios.get('http://localhost:3001/employees')
+        axios.get(`${BASE_URL}/employees`)
         .then(res => {
             if(!res.data.error){
                 setEmployeeList([...res.data.result]);
             }
         })
     }, [])
+
+    window.onkeydown = e => {
+        if (edit.isEditing && edit.id !== undefined && e.key === "Enter") {
+            handleEditEmployee(edit.id)
+        }
+    }
 
     return (
         <main className={styles.wrapper}>

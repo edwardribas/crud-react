@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Axios from 'axios';
 
 export const Register = () => {
+
+    const BASE_URL = 'http://localhost:3001';
 	const navigate = useNavigate();
 	const [name, setName] = useState('');
 	const [age, setAge] = useState(0);
@@ -11,7 +13,13 @@ export const Register = () => {
 	const [job, setJob] = useState('');
 	const [wage, setWage] = useState(0);
 	
-	const data = {name, age, country, job, wage};
+	const data = {
+		name: name.trim(), 
+		age,
+		country: country.trim(),
+		job: job.trim(), 
+		wage
+	};
 
 	const handleAddEmployee = () => {
 		if (
@@ -21,15 +29,15 @@ export const Register = () => {
 			country.trim() !== '' &&
 			job.trim() !== '' &&
 			wage > 0 &&
-			wage < 1000000000000
-		) {
-			Axios.post('http://localhost:3001/create', {...data})
+			wage < 1000000000000)
+			{
+			Axios.post(`${BASE_URL}/create`, {...data})
 			.then(res => {
-				if (res.data.error) console.log("Database couldn't be updated. ", res.data.error);
+				if (res.data.error) console.log("An error ocurred and database couldn't be updated.");
 				else navigate('/employees');
 			})
 		} else {
-			console.log("Database couldn't be updated.")
+			console.log("Please, review your inputed data.", {...data})
 		}
 	}
 
